@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jual Item Roblox</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+    .item {
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .item h2 {
+      margin-top: 0;
+    }
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+    select {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    .tagihan {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+    }
+    .stok {
+      color: green;
+      font-weight: bold;
+    }
+    a {
+      color: #007bff;
+      text-decoration: underline;
+    }
+    .upload-section {
+      margin-top: 10px;
+    }
+    input[type="file"] {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jual Item Roblox</h1>
+
+  <!-- ITEM 1 -->
+  <div class="item" id="itemDominus">
+    <h2>Item: Dominus Astra</h2>
+    <p>Harga: Rp 85.000</p>
+    <p class="stok">Sisa Stok: <span id="stokRaccoon">2</span></p>
+    <label for="metodeDominus">Metode Pembayaran:</label>
+    <select id="metodeDominus">
+      <option value="">-- Pilih --</option>
+      <option value="DANA">DANA</option>
+      <option value="OVO">OVO</option>
+      <option value="GoPay">GoPay</option>
+      <option value="QRIS">QRIS</option>
+    </select><br>
+    <button onclick="bayar('Raccoon', 85000, 'metodeRaccoon', 'tagihanRaccoon', 'hubungiRaccoon', this, 'stokRaccoon')">Bayar Sekarang</button>
+    <div class="tagihan" id="tagihanRaccoon"></div>
+    <button id="hubungiRaccoon" disabled onclick="hubungiAdmin('Raccoon')">Hubungi Admin</button>
+  </div>
+
+  <!-- ITEM 2 -->
+  <div class="item" id="itemRobux">
+    <h2>Item: T-rex</h2>
+    <p>Harga: Rp 55.000</p>
+    <p class="stok">Sisa Stok: <span id="stokT-rex">0</span></p>
+    <label for="metodeRobux">Metode Pembayaran:</label>
+    <select id="metodeT-rex">
+      <option value="">-- Pilih --</option>
+      <option value="DANA">DANA</option>
+      <option value="OVO">OVO</option>
+      <option value="GoPay">GoPay</option>
+      <option value="QRIS">QRIS</option>
+    </select><br>
+    <button onclick="bayar('T-rex', 55.000, 'metodeT-rex', 'tagihanT-rex', 'hubungiT-rex', this, 'stokT-rex')">Bayar Sekarang</button>
+    <div class="tagihan" id="tagihanT-rex"></div>
+    <button id="hubungiT-rex" disabled onclick="hubungiAdmin('T-rex')">Hubungi Admin</button>
+  </div>
+
+  <script>
+    function bayar(item, harga, metodeId, tagihanId, tombolHubungiId, tombolBayar, stokId) {
+      const metode = document.getElementById(metodeId).value;
+      const tagihan = document.getElementById(tagihanId);
+      const stokSpan = document.getElementById(stokId);
+      let stok = parseInt(stokSpan.innerText);
+
+      if (stok <= 0) {
+        alert("Stok habis.");
+        return;
+      }
+
+      if (!metode) {
+        alert('Silakan pilih metode pembayaran terlebih dahulu.');
+        return;
+      }
+
+      let linkBayar = '';
+      if (metode === "DANA") {
+        linkBayar = `<a href="dana://transfer?phone=081243982847&amount=${harga}" target="_blank">Klik untuk bayar via DANA</a>`;
+      } else if (metode === "OVO") {
+        linkBayar = `<a href="intent://pay/085385659185#Intent;scheme=ovo;package=ovo.id;end" target="_blank">Klik untuk bayar via OVO</a>`;
+      } else if (metode === "GoPay") {
+        linkBayar = `<a href="https://link.gopay.me?amount=${harga}" target="_blank">Klik untuk bayar via GoPay</a>`;
+      } else {
+        linkBayar = `QR Code akan dikirim via WA setelah klik "Saya Sudah Bayar".`;
+      }
+
+      tagihan.innerHTML = `
+        <strong>Tagihan Pembayaran:</strong><br>
+        Item: ${item}<br>
+        Harga: Rp ${harga.toLocaleString()}<br>
+        Metode: ${metode}<br><br>
+        Silakan transfer ke:<br>
+        <b>${
+          metode === "DANA" ? "081243982847 (DANA)" :
+          metode === "OVO" ? "085385659185 (OVO)" :
+          metode === "GoPay" ? "081234567890 (GoPay)" :
+          "QRIS"
+        }</b><br>
+        ${linkBayar}<br><br>
+        <button onclick="selesaiBayar('${tombolHubungiId}', '${tagihanId}', '${stokId}')">Saya Sudah Bayar</button>
+      `;
+      tagihan.style.display = "block";
+      tombolBayar.disabled = true;
+    }
+
+    function selesaiBayar(tombolId, tagihanId, stokId) {
+      const tagihan = document.getElementById(tagihanId);
+      const uploadId = `${tagihanId}-upload`;
+
+      tagihan.innerHTML += `
+        <div class="upload-section">
+          <label>Upload Bukti Transfer (gambar):</label><br>
+          <input type="file" accept="image/*" id="${uploadId}" onchange="cekBukti('${uploadId}', '${tombolId}', '${stokId}')">
+        </div>
+        <p style="color:red;"><b>*Tombol Hubungi Admin akan aktif setelah upload bukti.</b></p>
+      `;
+    }
+
+    function cekBukti(inputId, tombolId, stokId) {
+      const input = document.getElementById(inputId);
+      if (input.files && input.files[0]) {
+        document.getElementById(tombolId).disabled = false;
+        alert("Bukti transfer berhasil diunggah. Silakan hubungi admin.");
+        // Kurangi stok
+        const stokSpan = document.getElementById(stokId);
+        let stok = parseInt(stokSpan.innerText);
+        if (stok > 0) {
+          stokSpan.innerText = stok - 1;
+        }
+      }
+    }
+
+    function hubungiAdmin(item) {
+      window.location.href = "https://wa.me/6285385659185?text=Halo%20admin%2C%20saya%20sudah%20membayar%20untuk%20" + encodeURIComponent(item);
+    }
+  </script>
+</body>
+</html>
